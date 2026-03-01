@@ -2,7 +2,7 @@
     --bg: #020203;
     --land: #2a2a2d;
     --accent-red: #ff3e3e;
-    --glass: rgba(10, 10, 12, 0.7);
+    --glass: rgba(10, 10, 12, 0.85);
     --border: rgba(255, 255, 255, 0.08);
     --font-ui: 'Inter', sans-serif;
     --font-tac: 'JetBrains Mono', monospace;
@@ -40,7 +40,6 @@ body, html {
     font-size: 0.7rem; color: var(--accent-red); font-family: var(--font-tac);
     animation: tickerPaced 300s linear infinite;
 }
-
 @keyframes tickerPaced { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
 header { 
@@ -63,27 +62,59 @@ h1 { font-size: 1.1rem; letter-spacing: 5px; color: #fff; margin: 0; font-weight
 .nav-cluster button:hover { border-color: var(--accent-red); color: var(--accent-red); }
 
 #map-wrapper { width: 100vw; height: 100vh; z-index: 5; background: var(--bg); }
-path { fill: var(--land); stroke: #000; stroke-width: 0.5; transition: 0.2s; cursor: crosshair; pointer-events: all !important; }
+path { fill: var(--land); stroke: #000; stroke-width: 0.5; transition: 0.2s; cursor: crosshair; }
 .conflict-active { fill: #3d1414 !important; stroke: rgba(255, 62, 62, 0.6) !important; stroke-width: 0.7px; }
 .selected { fill: var(--accent-red) !important; stroke: #fff !important; stroke-width: 1px; }
 
+/* REFINED COLLAPSE LOGIC */
 #conflict-board { 
     position: absolute; bottom: 0; left: 0; width: 100%; 
     background: var(--glass); backdrop-filter: blur(15px); 
-    border-top: 1px solid var(--border); height: 160px; z-index: 100; 
+    border-top: 1px solid var(--border); height: 175px; z-index: 100; 
     display: flex; flex-direction: column; 
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease;
 }
-.board-header { padding: 12px 30px 0 30px; font-family: var(--font-tac); font-size: 0.5rem; color: #666; letter-spacing: 2px; font-weight: 700; }
 
-#conflict-stream { display: flex; gap: 12px; overflow-x: auto; padding: 15px 30px; scrollbar-width: none; flex: 1; }
+/* When collapsed: Background goes transparent, Blur is removed, and it slides down */
+#conflict-board.collapsed { 
+    transform: translateY(calc(100% - 40px)); 
+    background: transparent;
+    backdrop-filter: none;
+    border-top-color: transparent;
+}
+
+.board-header { 
+    padding: 12px 30px; display: flex; justify-content: space-between; align-items: flex-start;
+    border-bottom: 1px solid var(--border); transition: border 0.4s;
+}
+#conflict-board.collapsed .board-header { border-bottom-color: transparent; }
+
+.header-left { display: flex; flex-direction: column; gap: 4px; }
+.board-title { font-family: var(--font-tac); font-size: 0.55rem; color: #888; letter-spacing: 2px; font-weight: 700; }
+
+#level-stats { display: flex; gap: 12px; }
+.stat-item { font-family: var(--font-tac); color: #555; font-size: 0.45rem; letter-spacing: 1px; }
+.stat-count { color: var(--accent-red); font-weight: 900; margin-left: 3px; }
+
+#board-toggle {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff;
+    width: 24px; height: 24px; cursor: pointer; font-family: var(--font-tac);
+    display: flex; align-items: center; justify-content: center; transition: 0.2s;
+}
+#board-toggle:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+#conflict-stream { display: flex; gap: 12px; overflow-x: auto; padding: 15px 30px; scrollbar-width: none; flex: 1; transition: opacity 0.3s; }
+#conflict-board.collapsed #conflict-stream { opacity: 0; pointer-events: none; }
+#conflict-stream::-webkit-scrollbar { display: none; }
 
 .intel-card { 
     min-width: 280px; padding: 15px; background: rgba(255,255,255,0.03); 
     border: 1px solid var(--border); border-left: 3px solid var(--accent-red); cursor: pointer; transition: 0.2s;
 }
 .intel-card:hover { background: rgba(255, 62, 62, 0.08); border-color: var(--accent-red); }
+.card-name { font-family: var(--font-tac); font-size: 0.8rem; font-weight: 700; color: #fff; }
 .card-risk { font-family: var(--font-tac); font-size: 0.5rem; font-weight: 700; margin-top: 8px; color: var(--accent-red); }
-.card-subj { font-size: 0.65rem; color: #999; margin-top: 6px; line-height: 1.5; }
+.card-subj { font-size: 0.65rem; color: #999; margin-top: 6px; line-height: 1.5; font-family: var(--font-tac); }
 
 #info-portal { 
     position: fixed; top: 180px; left: 30px; 
@@ -98,4 +129,17 @@ path { fill: var(--land); stroke: #000; stroke-width: 0.5; transition: 0.2s; cur
 #p-subject { font-size: 0.75rem; color: #bbb; border-left: 1px solid #444; padding-left: 15px; margin-top: 20px; line-height: 1.6; }
 .subject-active { border-left-color: var(--accent-red) !important; }
 
+.action-btn { 
+    width: 100%; background: transparent; border: 1px solid var(--accent-red);
+    color: var(--accent-red); font-family: var(--font-tac); font-size: 0.6rem;
+    padding: 10px; cursor: pointer; transition: 0.2s; font-weight: 700; margin-top: 20px;
+}
+.action-btn:hover { background: var(--accent-red); color: #000; }
+
 .hidden { display: none !important; }
+
+@media screen and (max-width: 768px) {
+    #conflict-board { height: 210px; }
+    header { top: 35px; left: 10px; right: 10px; padding: 12px; }
+    #info-portal { left: 10px; right: 10px; width: auto; top: 140px; }
+}
