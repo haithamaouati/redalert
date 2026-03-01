@@ -5,9 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Global Conflict</title>
+    <meta name="title" content="Global Conflict">
+    <meta name="description" content="Advanced tactical intelligence interface for real-time global conflict monitoring. Developed for high-level systemic analysis.">
     <meta name="author" content="Haitham Aouati">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://github.com/haithamaouati">
+    <meta property="og:title" content="Global Conflict">
+    <meta property="og:description" content="Advanced tactical intelligence interface for real-time global conflict monitoring.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/haithamaouati/haithamaouati/main/assets/og-image.png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Global Conflict">
+    <meta property="twitter:description" content="Advanced tactical intelligence interface for real-time global conflict monitoring.">
+
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
 </head>
@@ -52,18 +65,15 @@
     </section>
 
     <div id="info-portal" class="hidden">
+        <button id="portal-close" onclick="kill()">×</button>
         <div class="portal-inner">
-            <div class="portal-head">
-                <span id="p-emoji"></span>
-                <div class="p-title-group">
-                    <h2 id="p-name"></h2>
-                    <span id="p-code"></span>
-                </div>
-            </div>
+            <div id="p-emoji"></div>
+            <h2 id="p-name"></h2>
+            <div id="p-code"></div>
             <div id="p-risk-tag"></div>
             <div id="p-subject"></div>
             <div id="portal-actions">
-                <button id="share-intel-btn" class="action-btn">SHARE INTEL</button>
+                <button id="share-intel-btn" class="action-btn" onclick="shareIntel()">SHARE INTEL</button>
             </div>
         </div>
     </div>
