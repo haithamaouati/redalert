@@ -1,22 +1,26 @@
 let pz;
 let countriesMaster = [];
 let CFR_DATA = {};
+let FEED_LOGS = {};
 
 async function boot() {
     try {
-        const [m, s, c] = await Promise.all([
+        const [m, s, c, f] = await Promise.all([
             fetch('./countries.json').then(r => r.json()),
             fetch('./world.svg').then(r => r.text()),
-            fetch('./conflicts.json').then(r => r.json())
+            fetch('./conflicts.json').then(r => r.json()),
+            fetch('./feed.json').then(r => r.json())
         ]);
         
         countriesMaster = Object.values(m).flat();
         CFR_DATA = c;
+        FEED_LOGS = f;
         
         document.getElementById('map-wrapper').innerHTML = s;
         setup();
         draw();
         ticker();
+        initClock();
         pz.fit();
         pz.center();
 
@@ -26,6 +30,18 @@ async function boot() {
     } catch (e) {
         console.error("SYSTEM_FAILURE", e);
     }
+}
+
+function initClock() {
+    const clockEl = document.getElementById('clock-display');
+    const updateTime = () => {
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        const timeStr = now.toTimeString().split(' ')[0];
+        clockEl.textContent = `${dateStr} | ${timeStr}`;
+    };
+    updateTime();
+    setInterval(updateTime, 1000);
 }
 
 function setup() {
@@ -95,10 +111,7 @@ function draw() {
 
 function ticker() {
     const t = document.getElementById('news-ticker');
-    const log = Object.entries(CFR_DATA).map(([code, data]) => {
-        const country = countriesMaster.find(x => x.code === code);
-        return `[LOG_${code}] ${country ? country.name.toUpperCase() : code} // ${data.subject} — `;
-    }).join(' ');
+    const log = Object.values(FEED_LOGS).map(entry => `${entry} — `).join(' ');
     t.textContent = (log + " ").repeat(2);
 }
 
@@ -141,7 +154,6 @@ function focus(code) {
     const targetZoom = Math.min(wrapper.clientWidth / bbox.width, wrapper.clientHeight / bbox.height) * 0.4;
     const finalZoom = Math.min(Math.max(targetZoom, 2), 15);
 
-    // Optimized offset to keep country clear of the card (65% horizontal)
     const isMobile = window.innerWidth <= 768;
     const offsetX = isMobile ? (wrapper.clientWidth / 2) : (wrapper.clientWidth * 0.65);
     const offsetY = isMobile ? (wrapper.clientHeight * 0.4) : (wrapper.clientHeight / 2);
@@ -163,9 +175,6 @@ function kill() {
     window.history.replaceState({}, document.title, window.location.pathname);
 }
 
-/**
- * FIXED: Secure Intelligence Sharing Logic
- */
 async function shareIntel() {
     const name = document.getElementById('p-name').innerText;
     const codeRaw = document.getElementById('p-code').innerText;
